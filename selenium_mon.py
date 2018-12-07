@@ -1,21 +1,16 @@
 # utilize the same logger function using library? or function
-#
-
 
 from selenium import webdriver
 import chromedriver_binary
 import time
 import requests
 
-
 ##### get user / pass #####
-
-f = open('D:/monitoring/test/user_pass', "r")
+f = open('D:/monitoring/user_pass', "r")
 u = f.read().splitlines()
 myuser = u[0]
 mypass = u[1]
 f.close()
-
 ###########################
 
 driver = webdriver.Chrome()
