@@ -45,7 +45,7 @@ else:
 
 ##################################
 
-f = open('D:\monitoring\hostlist', "r")
+f = open(r'D:\monitoring\hostlist', "r")
 
 # create list
 hosts_tmp = f.read().splitlines()
