@@ -10,24 +10,20 @@
 import pings
 import logging, datetime
 import sys
+from tkinter import Tk, messagebox
 
 ##### Logging Configuration #####
 
 # log file name
 today1 = datetime.date.today()
 logfile1 = 'logs/'+str(today1)+'.log'
-
-
 # Initiate logger
 logger = logging.getLogger('LoggingTest')
-
 # Logger level
 logger.setLevel(10)
-
 # Log file
 fh = logging.FileHandler(logfile1)
 logger.addHandler(fh)
-
 # Log Format
 formatter = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s', "%Y-%m-%d %H:%M:%S")
 fh.setFormatter(formatter)
@@ -52,7 +48,7 @@ hosts_tmp = f.read().splitlines()
 
 f.close()
 
-# exclude item who does not include '.'
+# exclude items who do not include '.'
 hosts = [s for s in hosts_tmp if '.' in s]
 
 # initiate object
@@ -70,4 +66,8 @@ for host in hosts:
         logger.log(20, "Ping succeeded to "+str(host))
     else:
         logger.log(20, "Ping FAILED to "+str(host))
+        root = Tk()
+        root.withdraw()
+        messagebox.showinfo('Ping FAILED', str(host))
+        root.quit()
 
