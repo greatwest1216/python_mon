@@ -60,14 +60,11 @@ for host in hosts:
     res = p.ping(host, times=3)
 
 #    res.print_messages()
-
     if res.is_reached():
-        #print("OK")
         logger.log(20, "Ping succeeded to "+str(host))
     else:
         logger.log(20, "Ping FAILED to "+str(host))
-        root = Tk()
-        root.withdraw()
-        messagebox.showinfo('Ping FAILED', str(host))
-        root.quit()
-
+#        root = Tk()
+#        root.withdraw()
+#        messagebox.showinfo('Ping FAILED', str(host))
+#        root.quit()
