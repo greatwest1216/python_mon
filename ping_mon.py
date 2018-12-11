@@ -3,7 +3,7 @@
 # Create one file per day for logging (done)
 # cron this script every 10 minutes (done)
 # you can use fqdn instead of IP address
-# you can comment out host by '#' 
+# you can comment out host by '#' (done)
 # when failure popup should show up
 # ping can be conducted in parallel for many hosts
 
@@ -12,7 +12,7 @@ import logging, datetime
 import sys
 from tkinter import Tk, messagebox
 
-##### Logging Configuration #####
+### Logging Configuration ###
 
 # log file name
 today1 = datetime.date.today()
@@ -28,7 +28,7 @@ logger.addHandler(fh)
 formatter = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s', "%Y-%m-%d %H:%M:%S")
 fh.setFormatter(formatter)
 
-##### Check if in LAN ############
+### Check if in LAN ###
 
 p = pings.Ping()
 res = p.ping('10.1.20.254', times=3)
@@ -39,17 +39,15 @@ if not res.is_reached():
 else:
     pass
 
-##################################
+### Create host list from file ###
 
 f = open(r'D:\monitoring\hostlist', "r")
-
-# create list
 hosts_tmp = f.read().splitlines()
-
 f.close()
+# exclude items who do not include '.' or who includes '#'
+hosts = [s for s in hosts_tmp if '.' in s and '#' not in s]
 
-# exclude items who do not include '.'
-hosts = [s for s in hosts_tmp if '.' in s]
+
 
 # initiate object
 p = pings.Ping()
