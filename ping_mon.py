@@ -4,13 +4,13 @@
 # cron this script every 10 minutes (done)
 # you can use fqdn instead of IP address
 # you can comment out host by '#' (done)
-# when failure popup should show up
+# when failure popup should show up (*** with task scheduler, it does not work)
 # ping can be conducted in parallel for many hosts
 
 import pings
 import logging, datetime
 import sys
-from tkinter import Tk, messagebox
+from win10toast import ToastNotifier
 
 ### Logging Configuration ###
 
@@ -47,22 +47,17 @@ f.close()
 # exclude items who do not include '.' or who includes '#'
 hosts = [s for s in hosts_tmp if '.' in s and '#' not in s]
 
-
-
 # initiate object
 p = pings.Ping()
 
-# ping each host from list
+### Ping each host to monitor and log it ###
 for host in hosts:
-#    print(host)
     res = p.ping(host, times=3)
 
-#    res.print_messages()
     if res.is_reached():
         logger.log(20, "Ping succeeded to "+str(host))
     else:
         logger.log(20, "Ping FAILED to "+str(host))
-#        root = Tk()
-#        root.withdraw()
-#        messagebox.showinfo('Ping FAILED', str(host))
-#        root.quit()
+        toaster = ToastNotifier()
+        toaster.show_toast(title='Ping Failed', msg=str(host), duration=5, threaded=True)
+
