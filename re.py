@@ -15,6 +15,16 @@ from contextlib import closing
 from datetime import datetime
 
 args = sys.argv
+
+### without any argument, just show help
+
+if len(args) == 1 or len(args) > 4:
+    print('syntax: python hogehoge')
+    sys.exit()
+
+else:
+    pass
+
 due_date = args[1]
 pic_name = args[2]
 task = args[3]
@@ -46,12 +56,24 @@ def list_reminder():
 
 ### function for insert ###
 
-with closing(sqlite3.connect(dbname)) as conn:
-    c = conn.cursor()
+def insert_reminder():
+    with closing(sqlite3.connect(dbname)) as conn:
+        c = conn.cursor()
+        sql = 'insert into reminders (due_date, pic_name, task, register_date) values (?,?,?,?)'
+        reminder1 = (due_date, pic_name, task, ima)
+        c.execute(sql, reminder1)
+        conn.commit()
 
-    sql = 'insert into reminders (due_date, pic_name, task, register_date) values (?,?,?,?)'
-    reminder1 = ('2018-12-31', 'osajima', 'WAAS contract', ima)
-    c.execute(sql, reminder1)
 
-    conn.commit()
+
+
+### if the first argument is 'list', show the list of reminder
+
+if args[1] == 'list':
+    list_reminder()
+
+
+else:
+    insert_reminder()
+
 
