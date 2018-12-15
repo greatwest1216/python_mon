@@ -1,15 +1,15 @@
-# When ping fails, popup shows up (done)
-# If this laptop is not connected to DSF LAN, monitoring should be temporarily stopped (done)
+# When ping fails, send notification to slack (not yet)
+# If this laptop is not connected to LAN, monitoring should be temporarily stopped (done)
 # Create one file per day for logging (done)
 # cron this script every 10 minutes (done)
-# you can use fqdn instead of IP address
+# you can use fqdn instead of IP address (not yet)
 # you can comment out host by '#' (done)
-# when failure popup should show up (*** with task scheduler, it does not work)
-# ping can be conducted in parallel for many hosts
+# ping can be conducted in parallel for many hosts (if possible)
 
 import pings
 import logging, datetime
 import sys
+import slackweb
 #from win10toast import ToastNotifier
 
 ### Logging Configuration ###
