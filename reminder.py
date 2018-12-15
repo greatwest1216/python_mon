@@ -106,20 +106,18 @@ def notify_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         #select_sql1 = 'select pic_name, task from reminders where due_date = ?'
-        select_sql1 = "select pic_name || '---' || task from reminders where due_date = ?"
+        select_sql1 = "select pic_name || '     ' || task from reminders where due_date = ?"
         record1 = (kyou,)
-        reminders_kyou = ()
+        reminders_kyou = ' '
         for row in c.execute(select_sql1, record1):
-#            print(row)
-            reminders_kyou += row
-#        print(reminders_kyou)
-#        list(reminders_kyou).split(',')
-        slacktext = ''' Today's reminders are below
-''' + str(reminders_kyou) + '''
-'''
+            reminders_kyou = reminders_kyou + str(row).split("'")[1] + '\n '
 
+        slacktext = '''Today's reminders are below:
+
+''' + reminders_kyou + '''
+'''
         print(slacktext)        
-#        slack.notify(text=slacktext)
+        slack.notify(text=slacktext)
 
 ### if the first argument is 'list', show the list of reminder
 
