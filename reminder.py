@@ -13,6 +13,7 @@
 # show column when list reminders (not yet, low priority)
 # do not write "connecting DB process" many times
 # need improve for error handling such as 'python reminder.py hoge'
+# modify the SQL (select -> SELECT) etc
 
 import sqlite3
 import os
@@ -30,6 +31,9 @@ suuji = r'^[0-9]+$'
 insert_message = 'New reminder is set.'
 delete_message = 'The reminder is deleted.'
 delete_cancel_message = 'Canceled.'
+with open('./slack_webhook_url.txt') as urlfile:
+    s = urlfile.read()
+slack = slackweb.Slack(url=s)
 
 ### without any argument or too many arguments, just show help
 
@@ -72,8 +76,8 @@ def insert_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         insert_sql = 'insert into reminders (due_date, pic_name, task, register_date) values (?,?,?,?)'
-        record1 = (args[1], args[2], args[3], ima)
-        c.execute(insert_sql, record1)
+        record = (args[1], args[2], args[3], ima)
+        c.execute(insert_sql, record)
         conn.commit()
         print(insert_message)
 
@@ -82,12 +86,15 @@ def insert_reminder():
 def delete_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
+
+        # check if the id's record exists (not yet)
+
         delete_sql = 'delete from reminders where id = ?'
-        record1 = (args[1]) 
+        record = (args[1],) 
         print("You're deleting reminder - id " + str(args[1]) + ".")
         kakunin = input("[Y/n]: ")
         if kakunin == 'Y':
-            c.execute(delete_sql,record1)
+            c.execute(delete_sql, record)
             conn.commit()
             print(delete_message)
         else:
@@ -98,15 +105,29 @@ def delete_reminder():
 def notify_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-        select_sql1 = ''
+        #select_sql1 = 'select pic_name, task from reminders where due_date = ?'
+        select_sql1 = "select pic_name || '---' || task from reminders where due_date = ?"
+        record1 = (kyou,)
+        reminders_kyou = ()
+        for row in c.execute(select_sql1, record1):
+#            print(row)
+            reminders_kyou += row
+#        print(reminders_kyou)
+#        list(reminders_kyou).split(',')
+        slacktext = ''' Today's reminders are below
+''' + str(reminders_kyou) + '''
+'''
 
-
-
+        print(slacktext)        
+#        slack.notify(text=slacktext)
 
 ### if the first argument is 'list', show the list of reminder
 
 if args[1] == 'list':
     list_reminder()
+
+elif args[1] == 'notify':
+    notify_reminder()
 
 elif re.match(suuji, args[1]):
     delete_reminder()
