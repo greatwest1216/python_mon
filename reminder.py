@@ -1,28 +1,31 @@
+#!/c/Users/kouhei-o/AppData/Local/Programs/Python/Python37/python
+
 #### Functions ##### 
 # Without arguments, show help
 # when the first argument is 'list', list reminders
 # when the first argument is number, delete the record of the id number
-# when 3 arguments are given, register new reminders
+# when 3 arguments are given, register a new reminder
 
 #### Issues #####
 # show column when list reminders (not yet)
-# do not write "DB connection" every time
-
+# do not write "connecting DB process" many times
 
 import sqlite3
 import os
 import sys
+import re as regex1
 from contextlib import closing
 from datetime import datetime
 
 args = sys.argv
+print(len(args))
 
 ### without any argument or too many arguments, just show help
 
 if len(args) == 1 or len(args) > 4:
-    print('list reminder : python ' + args[0] + ' list')
-    print('add  reminder : python ' + args[0] + ' [due date] [pic] [task]')
-    print('del  reminder : python ' + args[0] + ' [id]')
+    print('List reminders : python ' + args[0] + ' list')
+    print('Add a reminder : python ' + args[0] + ' [due date] [pic] [task]')
+    print('Del a reminder : python ' + args[0] + ' [id]')
 
     sys.exit()
 
@@ -31,7 +34,7 @@ else:
 
 ima = datetime.now().strftime("%Y-%m-%d %H:%M")
 dbname = 'reminders.db'
-
+suuji = r'[0-9]+'
 
 ### Check if DB file exists 
 
@@ -55,6 +58,7 @@ def list_reminder():
         #c.execute(mode_column)
         select_sql = 'select * from reminders'
         for row in c.execute(select_sql):
+            print('row')
             print(row)
 
 ### function for insert ###
@@ -70,18 +74,22 @@ def insert_reminder():
 
 ### function for delete ###
 
-def delete_reminder():
-    with closing(sqlite3.connect(dbname)) as conn:
-        c = conn.cursor()
-        sql = ''
-        reminder1 = 
-
+#def delete_reminder():
+#    with closing(sqlite3.connect(dbname)) as conn:
+#        c = conn.cursor()
+#        sql = ''
+#        reminder1 = 
+#
 
 ### if the first argument is 'list', show the list of reminder
 
 if args[1] == 'list':
+    print('list')
     list_reminder()
 
+#elif re.match(suuji, str(args[1])):
+#    print(args[1])
+#
 else:
     insert_reminder()
 
