@@ -10,7 +10,7 @@
 import pings
 import logging, datetime
 import sys
-from win10toast import ToastNotifier
+#from win10toast import ToastNotifier
 
 ### Logging Configuration ###
 
@@ -41,16 +41,15 @@ else:
 
 ### Create host list from file ###
 
-f = open(r'D:\monitoring\hostlist', "r")
-hosts_tmp = f.read().splitlines()
-f.close()
+with open(r'D:\monitoring\hostlist', "r") as f:
+    hosts_tmp = f.read().splitlines()
 # exclude items who do not include '.' or who includes '#'
 hosts = [s for s in hosts_tmp if '.' in s and '#' not in s]
 
-# initiate object
+### Ping each host to monitor and log it ###
+
 p = pings.Ping()
 
-### Ping each host to monitor and log it ###
 for host in hosts:
     res = p.ping(host, times=3)
 
@@ -58,6 +57,6 @@ for host in hosts:
         logger.log(20, "Ping succeeded to "+str(host))
     else:
         logger.log(20, "Ping FAILED to "+str(host))
-        toaster = ToastNotifier()
-        toaster.show_toast(title='Ping Failed', msg=str(host), duration=5, threaded=True)
+#        toaster = ToastNotifier()
+#        toaster.show_toast(title='Ping Failed', msg=str(host), duration=5, threaded=True)
 

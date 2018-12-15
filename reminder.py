@@ -7,6 +7,7 @@
 
 #### Advanced Functions ##### 
 # you can specify the due_date with 'kyo', 'asu', 'asatte', 'konshu', 'kongetsu' (not yet)
+# encrypt database file
 
 #### Issues #####
 # show column when list reminders (not yet, low priority)
