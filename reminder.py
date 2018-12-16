@@ -7,6 +7,7 @@
 
 #### Advanced Functions ##### 
 # you can specify the due_date with 'kyo', 'asu', 'asatte', 'konshu', 'kongetsu' (not yet)
+# you can skip mentioning YYYY (need processing args[1])
 # encrypt database file
 
 #### Issues #####
@@ -22,18 +23,31 @@ import re
 import slackweb
 from contextlib import closing
 from datetime import datetime
+from datetime import timedelta
+#from dateutil import relativedelta
+# pip install python-dateutil
 
 args = sys.argv
+now = datetime.now()
 ima = datetime.now().strftime("%Y-%m-%d %H:%M")
 kyou = datetime.now().strftime("%Y-%m-%d")
+nen = datetime.now().strftime("%Y")
+ashita = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+asatte = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
+shiasatte = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
 dbname = 'reminders.db'
 suuji = r'^[0-9]+$'
+nengappi = r'20[0-9]{2}-[0-9]{2}-[0-9]{2}'
+nichiji = r'[0-9]{2}-[0-9]{2}'
 insert_message = 'New reminder is set.'
 delete_message = 'The reminder is deleted.'
 delete_cancel_message = 'Canceled.'
 with open('./slack_webhook_url.txt') as urlfile:
     s = urlfile.read()
 slack = slackweb.Slack(url=s)
+
+print(ashita)
+sys.exit()
 
 ### without any argument or too many arguments, just show help
 
@@ -46,6 +60,21 @@ if len(args) == 1 or len(args) > 4:
 else:
     pass
 
+### Process args[1] if needed
+
+if re.match(nengappi, args[1]):
+    pass
+elif re.match(nichiji, args[1]):
+    args[1] = nen + "-" + args[1]
+#elif args[1] == '':
+#
+#elif args[1] == '':
+
+else:
+    pass
+
+
+
 ### Check if DB file exists 
 
 if os.path.isfile(dbname):
@@ -54,7 +83,7 @@ else:
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         ## only for the first time ##
-        create_table = '''create table if not exists reminders (id integer primary key autoincrement, due_date text, pic_name text, task text, register_date)'''
+        create_table = '''CREATE TABLE IF NOT EXISTS reminders (id integer primary key autoincrement, due_date text, pic_name text, task text, register_date)'''
         c.execute(create_table)
 
 ### function for list ###
@@ -66,7 +95,7 @@ def list_reminder():
         c = conn.cursor()
 #        c.execute("headers on")
 #        c.execute(mode_column)
-        select_sql = 'select * from reminders'
+        select_sql = 'SELECT * FROM reminders'
         for row in c.execute(select_sql):
             print(row)
 
@@ -75,7 +104,7 @@ def list_reminder():
 def insert_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-        insert_sql = 'insert into reminders (due_date, pic_name, task, register_date) values (?,?,?,?)'
+        insert_sql = 'INSERT INTO reminders (due_date, pic_name, task, register_date) VALUES (?,?,?,?)'
         record = (args[1], args[2], args[3], ima)
         c.execute(insert_sql, record)
         conn.commit()
@@ -89,7 +118,7 @@ def delete_reminder():
 
         # check if the id's record exists (not yet)
 
-        delete_sql = 'delete from reminders where id = ?'
+        delete_sql = 'DELETE FROM reminders WHERE id = ?'
         record = (args[1],) 
         print("You're deleting reminder - id " + str(args[1]) + ".")
         kakunin = input("[Y/n]: ")
@@ -105,8 +134,7 @@ def delete_reminder():
 def notify_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-        #select_sql1 = 'select pic_name, task from reminders where due_date = ?'
-        select_sql1 = "select pic_name || '     ' || task from reminders where due_date = ?"
+        select_sql1 = "SELECT pic_name || '     ' || task FROM reminders WHERE due_date = ?"
         record1 = (kyou,)
         reminders_kyou = ' '
         for row in c.execute(select_sql1, record1):
