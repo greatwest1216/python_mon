@@ -42,14 +42,14 @@ shiasatte = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
 #monday getsuyou
 #tuesday kayou
 #...
-dbname = 'reminders.db'
+dbname = 'files/reminders.db'
 suuji = r'^[0-9]+$'
 nengappi = r'20[0-9]{2}-[0-9]{2}-[0-9]{2}'
 nichiji = r'[0-9]{2}-[0-9]{2}'
 insert_message = 'New reminder is set.'
 delete_message = 'The reminder is deleted.'
 delete_cancel_message = 'Canceled.'
-slackurl = 'D:/monitoring/slack_webhook_url.txt'
+slackurl = 'D:/monitoring/files/slack_webhook_url.txt'
 with open(slackurl) as urlfile:
     s = urlfile.read()
 slack = slackweb.Slack(url=s)
