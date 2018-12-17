@@ -49,7 +49,8 @@ nichiji = r'[0-9]{2}-[0-9]{2}'
 insert_message = 'New reminder is set.'
 delete_message = 'The reminder is deleted.'
 delete_cancel_message = 'Canceled.'
-with open('./slack_webhook_url.txt') as urlfile:
+slackurl = 'D:/monitoring/slack_webhook_url.txt'
+with open(slackurl) as urlfile:
     s = urlfile.read()
 slack = slackweb.Slack(url=s)
 
@@ -72,8 +73,12 @@ elif re.match(nichiji, args[1]):
     args[1] = nen + "-" + args[1]
 elif args[1] == 'kyou':
     args[1] = kyou
-#elif args[1] == '':
-
+elif args[1] == 'ashita':
+    args[1] = ashita
+elif args[1] == 'asatte':
+    args[1] = asatte
+elif args[1] == 'shiasatte':
+    args[1] = shiasatte
 else:
     pass
 
@@ -147,7 +152,7 @@ def notify_reminder():
             reminders_kyou = reminders_kyou + str(row).split("'")[1] + '\n '
 #            print(row)
         slacktext = '''Today's reminders are below:
- id who         task
+ id  who               task
 ''' + reminders_kyou + '''
 '''
         print(slacktext)        

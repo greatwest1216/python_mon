@@ -10,7 +10,12 @@ import pings
 import logging, datetime
 import sys
 import slackweb
-#from win10toast import ToastNotifier
+
+### Slack webhook configuration ###
+
+with open('./slack_webhook_url.txt') as urlfile:
+    s = urlfile.read()
+slack = slackweb.Slack(url=s)
 
 ### Logging Configuration ###
 
@@ -57,6 +62,5 @@ for host in hosts:
         logger.log(20, "Ping succeeded to "+str(host))
     else:
         logger.log(20, "Ping FAILED to "+str(host))
-#        toaster = ToastNotifier()
-#        toaster.show_toast(title='Ping Failed', msg=str(host), duration=5, threaded=True)
+        slack.notify(text="Ping failed to "+str(host)+".")
 
