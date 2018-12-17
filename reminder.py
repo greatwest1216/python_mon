@@ -50,7 +50,7 @@ nichiji = r'[0-9]{2}-[0-9]{2}'
 insert_message = 'New reminder is set.'
 delete_message = 'The reminder is deleted.'
 delete_cancel_message = 'Canceled.'
-slackurl = 'D:/monitoring/files/slack_webhook_url.txt'
+slackurl = 'files/slack_webhook_url.txt'
 with open(slackurl) as urlfile:
     s = urlfile.read()
 slack = slackweb.Slack(url=s)
@@ -60,9 +60,9 @@ slack = slackweb.Slack(url=s)
 
 if len(args) == 1:
     print('<Usage>')
-    print('List reminders : python ' + args[0] + ' list')
-    print('Add a reminder : python ' + args[0] + ' [due date] [pic] [task]')
-    print('Del a reminder : python ' + args[0] + ' [id]')
+    print('List reminders : python ' + args[0] + ' list.')
+    print('Add a reminder : python ' + args[0] + ' [due date] [pic] [task].')
+    print('Del a reminder : python ' + args[0] + ' [id].')
     sys.exit()
 elif len(args) >= 5:
     i = 4
@@ -97,24 +97,19 @@ else:
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         ## only for the first time ##
-        create_table = '''CREATE TABLE IF NOT EXISTS reminders (id integer primary key autoincrement, due_date text, pic_name text, task text, register_date)'''
+        create_table = '''CREATE TABLE IF NOT EXISTS reminders (id integer primary key autoincrement, status text default 'OPEN', due_date text, pic_name text, task text, register_date)'''
         c.execute(create_table)
 
-### function for list ###
+### Function for list ###
 
 def list_reminder():
-    headers_on = r'.headers on'
-    mode_column = r'.mode column'
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-#        c.execute("headers on")
-#        c.execute(mode_column)
-        #select_sql = 'SELECT * FROM reminders'
-        select_sql = 'SELECT substr("00"||id,-2,2) as id, due_date, substr(pic_name||"               ",1,10) as pic_name, task FROM reminders'
+        select_sql = 'SELECT SUBSTR("00"||id,-2,2) AS id, due_date, SUBSTR(pic_name||"               ",1,10) AS pic_name, task FROM reminders'
         for row in c.execute(select_sql):
             print(row)
 
-### function for insert ###
+### Function for insert ###
 
 def insert_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
@@ -125,7 +120,7 @@ def insert_reminder():
         conn.commit()
         print(insert_message)
 
-### function for delete ###
+### Function for delete ###
 
 def delete_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
@@ -133,37 +128,39 @@ def delete_reminder():
 
         # check if the id's record exists (not yet)
 
-        delete_sql = 'DELETE FROM reminders WHERE id = ?'
+        #delete_sql = 'DELETE FROM reminders WHERE id = ?'
+        update_sql = 'UPDATE reminders SET status = "DONE" WHERE id = ?'
         record = (args[1],) 
         print("You're deleting reminder - id " + str(args[1]) + ".")
         kakunin = input("[Y/n]: ")
         if kakunin == 'Y':
-            c.execute(delete_sql, record)
+            c.execute(update_sql, record)
             conn.commit()
             print(delete_message)
         else:
             print(delete_cancel_message)
     
-### function for notify ###
+### Function for notify ###
 
 def notify_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         #select_sql1 = "SELECT pic_name || '     ' || task FROM reminders WHERE due_date = ?"
-        select_sql1 = 'SELECT substr("00"||id,-2,2) || "  " || substr(pic_name||"               ",1,10) || "  " || task FROM reminders WHERE due_date = ?'
+        select_sql1 = 'SELECT SUBSTR("000"||id,-3,3) || "  " || SUBSTR(pic_name||"               ",1,10) || "  " || task FROM reminders WHERE due_date = ? and status = "OPEN"'
         record1 = (kyou,)
-        reminders_kyou = ' '
+        reminders_kyou = ''
         for row in c.execute(select_sql1, record1):
-            reminders_kyou = reminders_kyou + str(row).split("'")[1] + '\n '
+            reminders_kyou = reminders_kyou + str(row).split("'")[1] + '\n'
 #            print(row)
         slacktext = '''Today's reminders are below:
- id  who               task
+
+id  who         task
 ''' + reminders_kyou + '''
 '''
         print(slacktext)        
         slack.notify(text=slacktext)
 
-### Run each function based of the args[1]
+### Run each Function based of the args[1]
 
 if args[1] == 'list':
     list_reminder()
