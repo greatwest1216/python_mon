@@ -4,17 +4,19 @@
 # when the first argument is number, delete the record of the id number (done)
 # when you delete the record, the verification message is given
 # when 3 arguments are given, register a new reminder
+# the third argument for 'task' can include blank
 
 #### Advanced Functions ##### 
 # you can specify the due_date with 'kyo', 'asu', 'asatte', 'konshu', 'kongetsu' (not yet)
-# you can skip mentioning YYYY (need processing args[1])
+# you can skip mentioning YYYY (need processing args[1]) (done)
 # encrypt database file
+# specify the number of letters in the column (done)
 
 #### Issues #####
-# show column when list reminders (not yet, low priority)
+# show column when list reminders (done)
 # do not write "connecting DB process" many times
 # need improve for error handling such as 'python reminder.py hoge'
-# modify the SQL (select -> SELECT) etc
+# modify the SQL (select -> SELECT) etc (done)
 
 import sqlite3
 import os
@@ -35,6 +37,11 @@ nen = datetime.now().strftime("%Y")
 ashita = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 asatte = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
 shiasatte = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
+#konshu
+#kongetsu
+#monday getsuyou
+#tuesday kayou
+#...
 dbname = 'reminders.db'
 suuji = r'^[0-9]+$'
 nengappi = r'20[0-9]{2}-[0-9]{2}-[0-9]{2}'
@@ -45,9 +52,6 @@ delete_cancel_message = 'Canceled.'
 with open('./slack_webhook_url.txt') as urlfile:
     s = urlfile.read()
 slack = slackweb.Slack(url=s)
-
-print(ashita)
-sys.exit()
 
 ### without any argument or too many arguments, just show help
 
@@ -66,8 +70,8 @@ if re.match(nengappi, args[1]):
     pass
 elif re.match(nichiji, args[1]):
     args[1] = nen + "-" + args[1]
-#elif args[1] == '':
-#
+elif args[1] == 'kyou':
+    args[1] = kyou
 #elif args[1] == '':
 
 else:
@@ -95,7 +99,8 @@ def list_reminder():
         c = conn.cursor()
 #        c.execute("headers on")
 #        c.execute(mode_column)
-        select_sql = 'SELECT * FROM reminders'
+        #select_sql = 'SELECT * FROM reminders'
+        select_sql = 'SELECT substr("00"||id,-2,2) as id, due_date, substr(pic_name||"               ",1,10) as pic_name, task FROM reminders'
         for row in c.execute(select_sql):
             print(row)
 
@@ -134,14 +139,15 @@ def delete_reminder():
 def notify_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-        select_sql1 = "SELECT pic_name || '     ' || task FROM reminders WHERE due_date = ?"
+        #select_sql1 = "SELECT pic_name || '     ' || task FROM reminders WHERE due_date = ?"
+        select_sql1 = 'SELECT substr("00"||id,-2,2) || "  " || substr(pic_name||"               ",1,10) || "  " || task FROM reminders WHERE due_date = ?'
         record1 = (kyou,)
         reminders_kyou = ' '
         for row in c.execute(select_sql1, record1):
             reminders_kyou = reminders_kyou + str(row).split("'")[1] + '\n '
-
+#            print(row)
         slacktext = '''Today's reminders are below:
-
+ id who         task
 ''' + reminders_kyou + '''
 '''
         print(slacktext)        
