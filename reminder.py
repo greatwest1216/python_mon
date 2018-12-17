@@ -2,9 +2,10 @@
 # Without arguments, show help (done)
 # when the first argument is 'list', list reminders (done)
 # when the first argument is number, delete the record of the id number (done)
-# when you delete the record, the verification message is given
-# when 3 arguments are given, register a new reminder
-# the third argument for 'task' can include blank
+# when you delete the record, the verification message is given (done)
+# when 3 arguments are given, register a new reminder (done)
+# the third argument for 'task' can include blank (done)
+# when the reminder is done, don't delete the record itself but just hide from SELECT results by adding new column
 
 #### Advanced Functions ##### 
 # you can specify the due_date with 'kyo', 'asu', 'asatte', 'konshu', 'kongetsu' (not yet)
