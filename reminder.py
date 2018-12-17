@@ -55,13 +55,19 @@ with open(slackurl) as urlfile:
 slack = slackweb.Slack(url=s)
 
 ### without any argument or too many arguments, just show help
+### if args[3] includes blank, it is merged into one argument
 
-if len(args) == 1 or len(args) > 4:
+if len(args) == 1:
     print('<Usage>')
     print('List reminders : python ' + args[0] + ' list')
     print('Add a reminder : python ' + args[0] + ' [due date] [pic] [task]')
     print('Del a reminder : python ' + args[0] + ' [id]')
     sys.exit()
+elif len(args) >= 5:
+    i = 4
+    while i <= len(args) - 1:
+        args[3] = args[3] + " " + args[i]
+        i = i + 1
 else:
     pass
 
@@ -81,8 +87,6 @@ elif args[1] == 'shiasatte':
     args[1] = shiasatte
 else:
     pass
-
-
 
 ### Check if DB file exists 
 
@@ -158,7 +162,7 @@ def notify_reminder():
         print(slacktext)        
         slack.notify(text=slacktext)
 
-### if the first argument is 'list', show the list of reminder
+### Run each function based of the args[1]
 
 if args[1] == 'list':
     list_reminder()
