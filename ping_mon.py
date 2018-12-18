@@ -1,3 +1,7 @@
+####################################
+#  Script to monitor host by ping  #
+####################################
+
 # you can use fqdn instead of IP address (not yet)
 # ping can be conducted in parallel for many hosts (if possible)
 
@@ -8,6 +12,7 @@ import slackweb
 from lib import my_log_module as lg
 
 ### Slack webhook configuration ###
+
 slackurl = 'files/slack_webhook_url.txt'
 with open(slackurl) as urlfile:
     s = urlfile.read()
@@ -46,6 +51,6 @@ for host in hosts:
     if res.is_reached():
         lg.logger.log(20, "Ping succeeded to "+str(host))
     else:
-        lg.logger.log(20, "Ping FAILED to "+str(host))
+        lg.logger.log(40, "Ping failed to "+str(host))
         slack.notify(text="Ping failed to "+str(host)+".")
 
