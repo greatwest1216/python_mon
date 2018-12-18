@@ -1,15 +1,11 @@
-# When ping fails, send notification to slack (not yet)
-# If this laptop is not connected to LAN, monitoring should be temporarily stopped (done)
-# Create one file per day for logging (done)
-# cron this script every 10 minutes (done)
 # you can use fqdn instead of IP address (not yet)
-# you can comment out host by '#' (done)
 # ping can be conducted in parallel for many hosts (if possible)
 
 import pings
 import logging, datetime
 import sys
 import slackweb
+from lib import my_log_module as lg
 
 ### Slack webhook configuration ###
 slackurl = 'files/slack_webhook_url.txt'
@@ -19,19 +15,7 @@ slack = slackweb.Slack(url=s)
 
 ### Logging Configuration ###
 
-# log file name
-today1 = datetime.date.today()
-logfile1 = 'logs/'+str(today1)+'.log'
-# Initiate logger
-logger = logging.getLogger('LoggingTest')
-# Logger level
-logger.setLevel(10)
-# Log file
-fh = logging.FileHandler(logfile1)
-logger.addHandler(fh)
-# Log Format
-formatter = logging.Formatter('%(asctime)s: %(levelname)s: %(message)s', "%Y-%m-%d %H:%M:%S")
-fh.setFormatter(formatter)
+lg.logfile_name('ping')
 
 ### Check if in LAN ###
 
@@ -39,7 +23,7 @@ p = pings.Ping()
 res = p.ping('10.1.20.254', times=3)
 
 if not res.is_reached():
-    logger.log(10, "Laptop is not connected to LAN")
+    lg.logger.log(10, "Laptop is not connected to LAN")
     sys.exit()
 else:
     pass
@@ -60,8 +44,8 @@ for host in hosts:
     res = p.ping(host, times=3)
 
     if res.is_reached():
-        logger.log(20, "Ping succeeded to "+str(host))
+        lg.logger.log(20, "Ping succeeded to "+str(host))
     else:
-        logger.log(20, "Ping FAILED to "+str(host))
+        lg.logger.log(20, "Ping FAILED to "+str(host))
         slack.notify(text="Ping failed to "+str(host)+".")
 
