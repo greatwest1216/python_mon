@@ -12,7 +12,7 @@ import sys
 import slackweb
 
 ### Slack webhook configuration ###
-slackurl = 'D:/monitoring/files/slack_webhook_url.txt'
+slackurl = 'files/slack_webhook_url.txt'
 with open(slackurl) as urlfile:
     s = urlfile.read()
 slack = slackweb.Slack(url=s)
@@ -46,7 +46,8 @@ else:
 
 ### Create host list from file ###
 
-with open('D:/monitoring/files/hostlist.txt', "r") as f:
+hostlist = 'files/hostlist.txt'
+with open(hostlist) as f:
     hosts_tmp = f.read().splitlines()
 # exclude items who do not include '.' or who includes '#'
 hosts = [s for s in hosts_tmp if '.' in s and '#' not in s]
