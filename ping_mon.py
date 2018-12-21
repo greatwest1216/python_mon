@@ -7,6 +7,7 @@
 
 import pings
 import logging, datetime
+import os
 import sys
 import slackweb
 from lib import my_log_module as lg
