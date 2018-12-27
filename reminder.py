@@ -38,7 +38,7 @@ nen = datetime.now().strftime("%Y")
 ashita = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 asatte = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
 shiasatte = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
-#konshu
+raishu = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
 #kongetsu
 #monday getsuyou
 #tuesday kayou
@@ -87,6 +87,8 @@ elif args[1] == 'asatte':
     args[1] = asatte
 elif args[1] == 'shiasatte':
     args[1] = shiasatte
+elif args[1] == 'raishu':
+    args[1] = raishu
 else:
     pass
 
