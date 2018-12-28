@@ -108,7 +108,8 @@ else:
 def list_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-        select_sql = 'SELECT SUBSTR("00"||id,-2,2) AS id, due_date, SUBSTR(pic_name||"               ",1,10) AS pic_name, task FROM reminders WHERE status = "OPEN" AND date(due_date) <= date("now", "+14 days") ORDER BY due_date'
+        #select_sql = 'SELECT SUBSTR("00"||id,-2,2) AS id, due_date, SUBSTR(pic_name||"               ",1,10) AS pic_name, task FROM reminders WHERE status = "OPEN" AND date(due_date) <= date("now", "+14 days") ORDER BY due_date'
+        select_sql = 'SELECT SUBSTR("000"||id,-3,3) || "  " || due_date || "  " || SUBSTR(pic_name||"               ",1,10) || "  " || task FROM reminders WHERE status = "OPEN" AND date(due_date) <= date("now", "+14 days") ORDER BY due_date'
         for row in c.execute(select_sql):
             print(row)
 
@@ -118,6 +119,7 @@ def insert_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         insert_sql = 'INSERT INTO reminders (due_date, pic_name, task, register_date) VALUES (?,?,?,?)'
+        #insert_sql = 'REPLACE INTO reminders (id, due_date, pic_name, task, register_date) VALUES (?,?,?,?,?)'
         record = (args[1], args[2], args[3], ima)
         c.execute(insert_sql, record)
         conn.commit()
@@ -173,7 +175,6 @@ elif args[1] == 'notify':
 
 elif re.match(suuji, args[1]):
     delete_reminder()
-
 else:
     insert_reminder()
 
