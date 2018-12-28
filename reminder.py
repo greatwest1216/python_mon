@@ -108,7 +108,7 @@ else:
 def list_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-        select_sql = 'SELECT SUBSTR("00"||id,-2,2) AS id, due_date, SUBSTR(pic_name||"               ",1,10) AS pic_name, task FROM reminders WHERE status = "OPEN"'
+        select_sql = 'SELECT SUBSTR("00"||id,-2,2) AS id, due_date, SUBSTR(pic_name||"               ",1,10) AS pic_name, task FROM reminders WHERE status = "OPEN" AND date(due_date) <= date("now", "+14 days") ORDER BY due_date'
         for row in c.execute(select_sql):
             print(row)
 
