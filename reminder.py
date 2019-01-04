@@ -50,7 +50,8 @@ nengappi = r'20[0-9]{2}-[0-9]{2}-[0-9]{2}'
 nichiji = r'[0-9]{2}-[0-9]{2}'
 insert_message = 'New reminder is set.'
 delete_message = 'The reminder is deleted.'
-delete_cancel_message = 'Canceled.'
+update_message =  'The reminder is updated.'
+cancel_message = 'Canceled.'
 slackurl = basedir+'/files/slack_webhook_url.txt'
 with open(slackurl) as urlfile:
     s = urlfile.read()
@@ -61,9 +62,9 @@ slack = slackweb.Slack(url=s)
 
 if len(args) == 1:
     print('<Usage>')
-    print('List reminders : python ' + args[0] + ' list.')
-    print('Add a reminder : python ' + args[0] + ' [due date] [pic] [task].')
-    print('Del a reminder : python ' + args[0] + ' [id].')
+    print('List reminders    : python ' + args[0] + ' list.')
+    print('Add new reminder  : python ' + args[0] + ' [due date] [pic] [task].')
+    print('Update a reminder : python ' + args[0] + ' [id].')
     sys.exit()
 elif len(args) >= 5:
     i = 4
@@ -74,23 +75,55 @@ else:
     pass
 
 ### Process args[1] if needed
+#
+#if re.match(nengappi, args[1]):
+#    pass
+#elif re.match(nichiji, args[1]):
+#    args[1] = nen + "-" + args[1]
+#elif args[1] == 'kyou':
+#    args[1] = kyou
+#elif args[1] == 'ashita':
+#    args[1] = ashita
+#elif args[1] == 'asatte':
+#    args[1] = asatte
+#elif args[1] == 'shiasatte':
+#    args[1] = shiasatte
+#elif args[1] == 'raishu':
+#    args[1] = raishu
+#else:
+#    pass
 
-if re.match(nengappi, args[1]):
-    pass
-elif re.match(nichiji, args[1]):
-    args[1] = nen + "-" + args[1]
-elif args[1] == 'kyou':
-    args[1] = kyou
-elif args[1] == 'ashita':
-    args[1] = ashita
-elif args[1] == 'asatte':
-    args[1] = asatte
-elif args[1] == 'shiasatte':
-    args[1] = shiasatte
-elif args[1] == 'raishu':
-    args[1] = raishu
+def process_date_argument(date_a):
+    global date_b
+    if re.match(nengappi, date_a):
+        pass
+    elif re.match(nichiji, date_a):
+        date_b = nen + "-" + date_a
+        return date_b
+    elif date_a == 'kyou':
+        date_b = kyou
+        return date_b
+    elif date_a == 'ashita':
+        date_b = ashita
+        return date_b
+    elif date_a == 'asatte':
+        date_b = asatte
+        return date_b
+    elif date_a == 'shiasatte':
+        date_b = shiasatte
+        return date_b
+    elif date_a == 'raishu':
+        date_b = raishu
+        return date_b
+    else:
+        pass
+
+process_date_argument(args[1])
+
+if 'date_b' in locals():
+    due_date0 = date_b
 else:
-    pass
+    id0 = args[1]
 
 ### Check if DB file exists 
 
@@ -119,31 +152,66 @@ def insert_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         insert_sql = 'INSERT INTO reminders (due_date, pic_name, task, register_date) VALUES (?,?,?,?)'
-        #insert_sql = 'REPLACE INTO reminders (id, due_date, pic_name, task, register_date) VALUES (?,?,?,?,?)'
-        record = (args[1], args[2], args[3], ima)
+        record = (due_date0, args[2], args[3], ima)
         c.execute(insert_sql, record)
         conn.commit()
         print(insert_message)
 
 ### Function for delete ###
 
-def delete_reminder():
+def update_reminder():
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
-
         # check if the id's record exists (not yet)
-
-        #delete_sql = 'DELETE FROM reminders WHERE id = ?'
-        update_sql = 'UPDATE reminders SET status = "DONE" WHERE id = ?'
-        record = (args[1],) 
-        print("You're deleting reminder - id " + str(args[1]) + ".")
-        kakunin = input("[Y/n]: ")
-        if kakunin == 'Y':
-            c.execute(update_sql, record)
+        select_sql1 = 'SELECT due_date, pic_name, task FROM reminders WHERE id = ?'
+        delete_sql1 = 'UPDATE reminders SET status = "DONE" WHERE id = ?'
+        record1 = (id0,) 
+        for row in c.execute(select_sql1, record1):
+            due_date1 = row[0]
+            pic_name1 = row[1]
+            task1 = row[2]
+        print("You're updating this reminder - %s %s %s" % (due_date1, pic_name1, task1))
+        kakunin = input("[Delete/Update/n]: ")
+        if kakunin.lower() == 'd':
+            c.execute(delete_sql1, record1)
             conn.commit()
             print(delete_message)
+        elif kakunin.lower() == 'u':
+
+            input_due_date = input("[%s]: " % (due_date1)) 
+            if input_due_date == '':
+                pass
+            else:
+                process_date_argument(input_due_date)
+                input_due_date = date_b
+                update_sql1 = 'UPDATE reminders SET due_date = ? WHERE id = ?'
+                record2 = (input_due_date, id0)
+                c.execute(update_sql1, record2)
+                conn.commit()
+                print(update_message)
+
+            input_pic_name = input("[%s]: " % (pic_name1)) 
+            if input_pic_name == '':
+                pass
+            else:
+                update_sql2 = 'UPDATE reminders SET pic_name = ? WHERE id = ?'
+                record3 = (input_pic_name, id0)
+                c.execute(update_sql2, record3)
+                conn.commit()
+                print(update_message)
+
+            input_task = input("[%s]: " % (task1)) 
+            if input_task == '':
+                pass
+            else:
+                update_sql3 = 'UPDATE reminders SET task = ? WHERE id = ?'
+                record4 = (input_pic_name, id0)
+                c.execute(update_sql3, record4)
+                conn.commit()
+                print(update_message)
+
         else:
-            print(delete_cancel_message)
+            print(cancel_message)
     
 ### Function for notify ###
 
@@ -174,7 +242,7 @@ elif args[1] == 'notify':
     notify_reminder()
 
 elif re.match(suuji, args[1]):
-    delete_reminder()
+    update_reminder()
 else:
     insert_reminder()
 
