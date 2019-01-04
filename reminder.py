@@ -62,9 +62,9 @@ slack = slackweb.Slack(url=s)
 
 if len(args) == 1:
     print('<Usage>')
-    print('List reminders    : python ' + args[0] + ' list.')
-    print('Add new reminder  : python ' + args[0] + ' [due date] [pic] [task].')
-    print('Update a reminder : python ' + args[0] + ' [id].')
+    print('List reminders    : python /path/to/reminder.py list.')
+    print('Add new reminder  : python /path/to/reminder.py [due date] [pic] [task].')
+    print('Update a reminder : python /path/to/reminder.py [id].')
     sys.exit()
 elif len(args) >= 5:
     i = 4
