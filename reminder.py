@@ -74,55 +74,33 @@ elif len(args) >= 5:
 else:
     pass
 
-### Process args[1] if needed
-#
-#if re.match(nengappi, args[1]):
-#    pass
-#elif re.match(nichiji, args[1]):
-#    args[1] = nen + "-" + args[1]
-#elif args[1] == 'kyou':
-#    args[1] = kyou
-#elif args[1] == 'ashita':
-#    args[1] = ashita
-#elif args[1] == 'asatte':
-#    args[1] = asatte
-#elif args[1] == 'shiasatte':
-#    args[1] = shiasatte
-#elif args[1] == 'raishu':
-#    args[1] = raishu
-#else:
-#    pass
-
-def process_date_argument(date_a):
-    global date_b
-    if re.match(nengappi, date_a):
-        pass
-    elif re.match(nichiji, date_a):
-        date_b = nen + "-" + date_a
-        return date_b
-    elif date_a == 'kyou':
-        date_b = kyou
-        return date_b
-    elif date_a == 'ashita':
-        date_b = ashita
-        return date_b
-    elif date_a == 'asatte':
-        date_b = asatte
-        return date_b
-    elif date_a == 'shiasatte':
-        date_b = shiasatte
-        return date_b
-    elif date_a == 'raishu':
-        date_b = raishu
-        return date_b
+def process_date(x):
+    if re.match(nengappi, x):
+        return x
+    elif re.match(nichiji, x):
+        x = nen + "-" + x
+        return x
+    elif x == 'kyou':
+        x = kyou
+        return x
+    elif x == 'ashita':
+        x = ashita
+        return x
+    elif x == 'asatte':
+        x = asatte
+        return x
+    elif x == 'shiasatte':
+        x = shiasatte
+        return x
+    elif x == 'raishu':
+        x = raishu
+        return x
     else:
-        pass
+        return x
 
-process_date_argument(args[1])
-
-if 'date_b' in locals():
-    due_date0 = date_b
-else:
+if args[1] != process_date(args[1]):
+    due_date0 = process_date(args[1]) 
+else: 
     id0 = args[1]
 
 ### Check if DB file exists 
@@ -182,8 +160,7 @@ def update_reminder():
             if input_due_date == '':
                 pass
             else:
-                process_date_argument(input_due_date)
-                input_due_date = date_b
+                input_due_date = process_date(input_due_date)
                 update_sql1 = 'UPDATE reminders SET due_date = ? WHERE id = ?'
                 record2 = (input_due_date, id0)
                 c.execute(update_sql1, record2)
