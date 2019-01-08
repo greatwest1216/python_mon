@@ -164,7 +164,7 @@ def update_reminder():
                 pass
             else:
                 update_sql3 = 'UPDATE reminders SET task = ? WHERE id = ?'
-                record4 = (input_pic_name, id0)
+                record4 = (input_task, id0)
                 c.execute(update_sql3, record4)
                 conn.commit()
                 print(update_message)
