@@ -149,7 +149,7 @@ def update_reminder():
             pic_name1 = row[1]
             task1 = row[2]
         print("You're updating this reminder - %s %s %s" % (due_date1, pic_name1, task1))
-        kakunin = input("[Delete/Update/n]: ")
+        kakunin = input("[Done/Update/n]: ")
         if kakunin.lower() == 'd':
             c.execute(delete_sql1, record1)
             conn.commit()
