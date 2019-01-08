@@ -1,29 +1,8 @@
-#### Basic Functions ##### 
-# Without arguments, show help (done)
-# when the first argument is 'list', list reminders (done)
-# when the first argument is number, delete the record of the id number (done)
-# when you delete the record, the verification message is given (done)
-# when 3 arguments are given, register a new reminder (done)
-# the third argument for 'task' can include blank (done)
-# when the reminder is done, don't delete the record itself but just hide from SELECT results by adding new column
-
-#### Advanced Functions ##### 
-# you can specify the due_date with 'kyo', 'asu', 'asatte', 'konshu', 'kongetsu' (not yet)
-# you can skip mentioning YYYY (need processing args[1]) (done)
-# encrypt database file
-# specify the number of letters in the column (done)
-
-#### Issues #####
-# show column when list reminders (done)
-# do not write "connecting DB process" many times
-# need improve for error handling such as 'python reminder.py hoge'
-# modify the SQL (select -> SELECT) etc (done)
-
-import sqlite3
 import os
 import sys
 import re
 import slackweb
+import sqlite3
 from contextlib import closing
 from datetime import datetime
 from datetime import timedelta
@@ -39,17 +18,14 @@ ashita = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
 asatte = (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d")
 shiasatte = (datetime.now() + timedelta(days=3)).strftime("%Y-%m-%d")
 raishu = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
-#kongetsu
-#monday getsuyou
-#tuesday kayou
-#...
+
 basedir = (os.path.dirname(os.path.abspath(__file__))).replace('\\','/')
 dbname = basedir+'/files/reminders.db'
 suuji = r'^[0-9]+$'
 nengappi = r'20[0-9]{2}-[0-9]{2}-[0-9]{2}'
 nichiji = r'[0-9]{2}-[0-9]{2}'
 insert_message = 'New reminder is set.'
-delete_message = 'The reminder is deleted.'
+done_message = 'The reminder is done.'
 update_message =  'The reminder is updated.'
 cancel_message = 'Canceled.'
 slackurl = basedir+'/files/slack_webhook_url.txt'
@@ -57,7 +33,7 @@ with open(slackurl) as urlfile:
     s = urlfile.read()
 slack = slackweb.Slack(url=s)
 
-### without any argument or too many arguments, just show help
+### without any argument, just show help
 ### if args[3] includes blank, it is merged into one argument
 
 if len(args) == 1:
@@ -73,6 +49,8 @@ elif len(args) >= 5:
         i = i + 1
 else:
     pass
+
+### args[1] might come date or id
 
 def process_date(x):
     if re.match(nengappi, x):
@@ -98,16 +76,20 @@ def process_date(x):
     else:
         return x
 
-if args[1] != process_date(args[1]):
-    due_date0 = process_date(args[1]) 
-else: 
+args[1] = process_date(args[1])
+
+if re.match(nengappi, args[1]):
+    due_date0 = args[1]
+else:
     id0 = args[1]
+
 
 ### Check if DB file exists 
 
 if os.path.isfile(dbname):
     pass
 else:
+    print('Creating new dbfiles...')
     with closing(sqlite3.connect(dbname)) as conn:
         c = conn.cursor()
         ## only for the first time ##
@@ -153,7 +135,7 @@ def update_reminder():
         if kakunin.lower() == 'd':
             c.execute(delete_sql1, record1)
             conn.commit()
-            print(delete_message)
+            print(done_message)
         elif kakunin.lower() == 'u':
 
             input_due_date = input("[%s]: " % (due_date1)) 
@@ -222,5 +204,3 @@ elif re.match(suuji, args[1]):
     update_reminder()
 else:
     insert_reminder()
-
-
