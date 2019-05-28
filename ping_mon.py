@@ -2,9 +2,6 @@
 #  Script to monitor host by ping  #
 ####################################
 
-# you can use fqdn instead of IP address (not yet)
-# ping can be conducted in parallel for many hosts (if possible)
-
 import pings
 import logging, datetime
 import os

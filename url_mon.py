@@ -30,7 +30,8 @@ urls = [ s for s in urls_tmp if 'http' in s and '#' not in s ]
 ### Check the HTTP status code of each URL ###
 
 for url in urls:
-    res = requests.get(url, verify=False, headers={'Cache-Control': 'no-cache'})
+    #res = requests.get(url, verify=False, headers={'Cache-Control': 'no-cache'})
+    res = requests.get(url, headers={'Cache-Control': 'no-cache'})
 
     if res.status_code == 200:
         lg.logger.log(20, 'URL Check succeeded to ' + str(url))
